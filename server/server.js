@@ -43,7 +43,7 @@ async function addTraveller(_, {ticket})
   console.log('Blacklist result:', blacklistResult);
   if (blacklistResult !== null) {
     return {
-      id: -1,
+      id: 0,
       name: '',
       phone: -1,
       bookingTime: ticket.bookingTime   

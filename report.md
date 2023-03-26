@@ -3,11 +3,12 @@
 # Report for assiginment 4
 
 
-- Github repo link and branch name    
-  - Repo link: https://github.com/IT5007-2220/assignment-4-Fazziekey
-  - Branch name: main
+## Github repo link and branch name    
 
-- Steps to set up application
+- Repo link: https://github.com/IT5007-2220/assignment-4-Fazziekey
+- Branch name: main
+
+## Steps to set up application
 
 ```
 docker load -i docker_image_mongo.tar
@@ -20,13 +21,30 @@ npm run compile
 ```
 
 
-- How to launch application
+## How to launch application
 
 ```
 npm start
 ```
 
-- All features you have implemented
+## All features implemented
 
+### initialize the database
+
+```shell
+mongo tickettoride scripts/init.mongo.js
+
+```
+### show travelers 
+![show travel](2.png)
+
+
+### add
+
+### delete
+
+### blacklist
+
+### css 
 
 ![demo](1.png)

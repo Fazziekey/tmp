@@ -19,14 +19,14 @@ async function graphQLFetch(query, variables = {}) {
       const error = result.errors[0];
       if (error.extensions.code == 'BAD_USER_INPUT') {
         const details = error.extensions.exception.errors.join('\n ');
-        alert(`${error.message}:\n ${details}`);
+        alert(`Error: ${error.message}:\n ${details}`);
       } else {
-        alert(`${error.extensions.code}: ${error.message}`);
+        alert(`Error: ${error.extensions.code}: ${error.message}`);
       }
     }
     return result.data;
   } catch (e) {
-    alert(`Error in sending data to server: ${e.message}`);
+    alert(`Error: ${e.message}`);
   }
 }
 
@@ -249,9 +249,11 @@ class TicketToRide extends React.Component {
       const result = await graphQLFetch(mutation, variables);
       const addResult = result.addTraveller;
       console.log(addResult);
-      if(addResult.id === -1) {
-        alert('Traveler has been blacklisted');
+      if(addResult.id === 0) {
+        alert('Traveler blacklisted !!!!!, change the name and try again');
         return;
+      }else{
+        alert('Traveler added successfully');
       }
       const newTraveler = addResult;
       this.setState({ travellers: this.state.travellers.concat(newTraveler) });
@@ -281,6 +283,7 @@ class TicketToRide extends React.Component {
       const deleteSuccess = result.deleteTraveller;
       // Do something with the delete success value, such as updating the UI
       if (deleteSuccess) {
+        alert('Traveler deleted successfully');
         this.loadData();
       } else {
         console.log(`Failed to delete traveler with name ${traveler.name}`);
@@ -314,9 +317,9 @@ class TicketToRide extends React.Component {
       const blacklistSuccess = result.blacklistTraveller;
       // Do something with the blacklist success value, such as updating the UI
       if (blacklistSuccess) {
-        console.log(`Traveller ${name} has been blacklisted`);
+        console.log(`Traveller ${name} blacklisted`);
       } else {
-        console.log(`Failed to blacklist traveller ${name}`);
+        console.log(`Failed backlist ${name}`);
       }
     } catch (error) {
       console.error(error);
