@@ -13,7 +13,14 @@ async function listTravellers()
 {
 	/*Q2: Write code to talk to DB and read the list of travellers
 	 * */
-
+  try {
+    const collection = db.collection('travellers');
+    const travellers = await collection.find().toArray();
+    return travellers;
+  } catch (error) {
+    console.error(error);
+    throw new UserInputError('Failed');
+  }
 
 	/*End of Q2*/
 }
@@ -31,10 +38,30 @@ async function addTraveller(_, {ticket})
 	  return result.value.current;
 	}
 	ticket.id = await getNextSequence('fixedindex');
-
+  const blacklistCollection = db.collection('blacklist');
+  const blacklistResult = await blacklistCollection.findOne({ name: ticket.name });
+  console.log('Blacklist result:', blacklistResult);
+  if (blacklistResult !== null) {
+    return {
+      id: -1,
+      name: '',
+      phone: -1,
+      bookingTime: ticket.bookingTime   
+    }
+  }
 	/*Q2: Write code to talk to DB and add a new ticket.
 	 * Make sure you return the correct value of the correct type as per the schema.*/
+  const collection = db.collection('travellers');
+  const insertResult = await collection.insertOne(ticket);
+  const newTraveler = insertResult.ops[0];
 
+  // Return the new traveler object, including the generated ID and bookingTime
+  return {
+    id: newTraveler.id.toString(),
+    name: newTraveler.name,
+    phone: newTraveler.phone,
+    bookingTime: newTraveler.bookingTime
+  };
 
 	/*End of Q2*/
 }
@@ -65,13 +92,16 @@ const GraphQLDate = new GraphQLScalarType({
   },
 });
 
-async function deleteTraveller()
+async function deleteTraveller(_, {travellername})
 {
 	/*Q2: Write code to talk to DB and delete the given passenger.
 	 * Note: Ensure that the function parameters for deleteTraveller() defined above  matches the
 	 * schema defined in travellerschema.graphql.*/
+  const collection = db.collection('travellers');
+  const result = await collection.deleteOne({ name: travellername });
 
-
+  // Return a Boolean indicating whether the delete operation succeeded
+  return result.deletedCount === 1;
 	/*End of Q2*/
 }
 
@@ -80,8 +110,16 @@ async function deleteTraveller()
  * This function should accept a traveller name and add them to a collection named blacklist.
  * */
 
-
-
+async function blacklistTraveller(_, { travellername }) {
+  try {
+    const collection = db.collection('blacklist');
+    const result = await collection.insertOne({ name: travellername });
+    return result.insertedCount === 1;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
 /*End of Q4*/
 
 const resolvers = {
@@ -92,6 +130,7 @@ const resolvers = {
     addTraveller,
     deleteTraveller,
     /*Q4. Make an entry for blacklistTraveller resolver here*/
+    blacklistTraveller
   },
   GraphQLDate,
 };

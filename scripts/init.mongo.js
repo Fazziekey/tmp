@@ -17,6 +17,69 @@ db.blacklist.remove({});
  * Enter the list of travellers into the DB collection named 'travellers'.
  * */
 
+db.travellers.insertMany([
+    {
+        id: 1,
+        name: 'Jams',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 2,
+        name: 'cookies',
+        phone: '87994939',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 3,
+        name: 'chips',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 4,
+        name: 'chocolate',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {   
+        id: 5,
+        name: 'milk',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 6,
+        name: 'bread',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 7,
+        name: 'butter',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 8,
+        name: 'cheese',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 9,
+        name: 'eggs',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+    {
+        id: 10,
+        name: 'sugar',
+        phone: '121310',
+        bookingTime: new Date('2023-01-01T12:00:00Z'),
+    },
+]);
+
 
 /*Q1 code ends here*/
 

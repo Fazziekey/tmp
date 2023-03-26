@@ -10,8 +10,61 @@
 
   <script src="https://unpkg.com/@babel/polyfill@7/dist/polyfill.min.js"></script>
   <style>
-    table.bordered-table th, td {border: 1px solid silver; padding: 4px;}
-    table.bordered-table {border-collapse: collapse;}
+    table.bordered-table th,
+    table.bordered-table td {
+      border: 1px solid silver;
+      padding: 5px;
+    }
+    table.bordered-table {
+      border-collapse: collapse;
+    }
+    table.bordered-table tr:nth-child(odd) {
+      background-color: #AAAE8E;
+    }
+    table.bordered-table tr:nth-child(even) {
+      background-color: #E0E0E0;
+    }
+    table.bordered-table th {
+      background-color: #3A606E;
+    }
+    table.bordered-table td {
+      background-color: #E0E0E0;
+    }
+    table.bordered-table tr:hover {
+      background-color: #3A606E;
+    }
+    table.bordered-table tr:hover td {
+      background-color: #AAAE8E;
+    }
+    table.bordered-table tr:hover td:hover {
+      background-color: #E0E0E0;
+    }
+    form {
+      padding: 10px;
+      border: 1px solid silver;
+      background-color: #AAAE8E;
+    }
+    form input {
+      margin: 3px;
+    }
+    button {
+      margin: 7px;
+      background-color: #828E82;
+      border: none;
+      padding: 5px 10px;
+      color: #E0E0E0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    form button {
+      margin: 7px;
+      background-color: #828E82;
+      border: none;
+      padding: 2px 2px;
+      color: #E0E0E0;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 </head>
 

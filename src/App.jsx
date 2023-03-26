@@ -9,7 +9,7 @@ async function graphQLFetch(query, variables = {}) {
   try {
     const response = await fetch('/graphql', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json'},
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables })
     });
     const body = await response.text();
@@ -97,6 +97,7 @@ class Delete extends React.Component {
     super();
     this.handleSubmit = this.handleSubmit.bind(this);
   }
+
   handleSubmit(e) {
     e.preventDefault();
     const form = document.forms.deleteTraveller;
@@ -123,34 +124,70 @@ class Delete extends React.Component {
  *   right parameters.
  * - Make sure to invalidate/clear the form input fileds in the UI during cleanup.*/
 
+class Blacklist extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      travellerName: '',
+    };
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const form = document.forms.blacklistTraveller;
+    const passenger = {
+      name: form.travellername.value,
+    }
+    this.props.blacklistTraveller(passenger);
+    form.travellername.value = "";
+  }
+
+  render() {
+    return (
+      <div>
+        <form name="blacklistTraveller" onSubmit={this.handleSubmit}>
+          <label htmlFor="travellername">Traveller Name:</label>
+          <input
+            id="travellername"
+            name="travellername"
+            type="text"
+          />
+          <button type="submit">Blacklist Traveller</button>
+        </form>
+      </div>
+    );
+  }
+}
 
 /*End of Q4*/
 
 
 class Homepage extends React.Component {
-	constructor() {
-	super();
-	}
-	render(){
-	return (
-	<div>
-		<h5>Placeholder for Homepage</h5>
-	</div>);
-	}
+  constructor() {
+    super();
+  }
+  render(){
+    return (
+      <div>
+        <h5>Placeholder for Homepage</h5>
+      </div>);
+  }
 }
+
 class TicketToRide extends React.Component {
   constructor() {
     super();
-    this.state = { travellers: [], selector: 1};
+    this.state = { travellers: [], selector: 1 };
     this.bookTraveller = this.bookTraveller.bind(this);
     this.deleteTraveller = this.deleteTraveller.bind(this);
     this.blacklistTraveller = this.blacklistTraveller.bind(this);
   }
 
-  setSelector(value)
-  {
-	  this.setState({selector: value});
+  setSelector(value) {
+    this.setState({ selector: value });
   }
+
   componentDidMount() {
     this.loadData();
   }
@@ -160,9 +197,26 @@ class TicketToRide extends React.Component {
      * - Write the query
      * - Make a call to graphQLFetch with parameter: query
      * - Post process data and take some action (e.g., re-load UI)  */
-  
+    const query = `
+      query {
+        listTravellers {
+          id
+          name
+          phone
+          bookingTime
+        }
+      }
+    `;
 
-     /*End of Q3*/
+    try {
+      const result = await graphQLFetch(query);
+      console.log(result.listTravellers);
+      const travelers = result.listTravellers;
+      this.setState({ travellers: travelers });
+    } catch (error) {
+      console.error(error);
+    }
+    /*End of Q3*/
   }
 
   async bookTraveller(passenger) {
@@ -170,9 +224,42 @@ class TicketToRide extends React.Component {
      * - Write the mutation
      * - Make a call to graphQLFetch with two parameters: mutation query, {variable}
      * - Post process data and take some action (e.g., re-load UI)  */
-  
 
-     /*End of Q3*/
+    const mutation = `
+      mutation AddTraveler($ticket: InputTicket!) {
+        addTraveller(ticket: $ticket) {
+          id
+          name
+          phone
+          bookingTime
+        }
+      }
+    `;
+
+    const bookingTime = new Date().toISOString();
+    const ticket = {
+      name: passenger.name,
+      phone: passenger.phone,
+      bookingTime
+    };
+
+    const variables = { ticket };
+
+    try {
+      const result = await graphQLFetch(mutation, variables);
+      const addResult = result.addTraveller;
+      console.log(addResult);
+      if(addResult.id === -1) {
+        alert('Traveler has been blacklisted');
+        return;
+      }
+      const newTraveler = addResult;
+      this.setState({ travellers: this.state.travellers.concat(newTraveler) });
+    } catch (error) {
+      console.error(error);
+    }
+
+    /*End of Q3*/
   }
 
   async deleteTraveller(passenger) {
@@ -180,46 +267,91 @@ class TicketToRide extends React.Component {
      * - Write the mutation
      * - Make a call to graphQLFetch with two parameters: mutation query, {variable}
      * - Post process data and take some action (e.g., re-load UI)  */
-  
 
-     /*End of Q3*/
+    const mutation = `
+      mutation DeleteTraveller($travellername: String!) {
+        deleteTraveller(travellername: $travellername)
+      }
+    `;
+
+    const variables = { travellername: passenger.name };
+
+    try {
+      const result = await graphQLFetch(mutation, variables);
+      const deleteSuccess = result.deleteTraveller;
+      // Do something with the delete success value, such as updating the UI
+      if (deleteSuccess) {
+        this.loadData();
+      } else {
+        console.log(`Failed to delete traveler with name ${traveler.name}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    /*End of Q3*/
   }
+
   async blacklistTraveller(passenger) {
     /*Q4: Code to blacklist traveller at the back-end
      * - Write a mutation to blacklist traveller by providing the name.
      * - Make a call to graphQLFetch to execute the query.
      * - graphQLFetch accepts two parameters: query and {variable}  
      * - This GraphQL API call does not return anything. */
-    
+
+    const mutation = `
+      mutation BlacklistTraveller($travellername: String!) {
+        blacklistTraveller(travellername: $travellername)
+      }
+    `;
+
+    const name = passenger.name;
+    console.log(name);
+    const variables = { travellername: name };
+
+    try {
+      const result = await graphQLFetch(mutation, variables);
+      const blacklistSuccess = result.blacklistTraveller;
+      // Do something with the blacklist success value, such as updating the UI
+      if (blacklistSuccess) {
+        console.log(`Traveller ${name} has been blacklisted`);
+      } else {
+        console.log(`Failed to blacklist traveller ${name}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
 
     /*End of Q4*/
   }
+
+
   render() {
     return (
       <div>
         <h1>Ticket To Ride</h1>
-	<div>
-        <button onClick={()=>this.setSelector(1)}>Homepage</button>
-        <button onClick={()=>this.setSelector(2)}>Display Travellers</button>
-        <button onClick={()=>this.setSelector(3)}>Add Traveller</button>
-        <button onClick={()=>this.setSelector(4)}>Delete Traveller</button>
-        <button onClick={()=>this.setSelector(5)}>Blacklist Traveller</button>
-	</div>
-	{
-		this.state.selector === 1? <Homepage />:<hr/>
-	}
-	{
-		this.state.selector === 2? <Display travellers={this.state.travellers} />:<hr/>
-	}
-	{
-		this.state.selector === 3? <Add bookTraveller={this.bookTraveller} />: <hr/>
-	}
-	{
-		this.state.selector === 4? <Delete deleteTraveller={this.deleteTraveller} />: <hr/>
-	}
-	{
-		this.state.selector === 5? <Blacklist blacklistTraveller={this.blacklistTraveller} />: <hr/>
-	}
+        <div>
+          <button onClick={() => this.setSelector(1)}>Homepage</button>
+          <button onClick={() => this.setSelector(2)}>Display Travellers</button>
+          <button onClick={() => this.setSelector(3)}>Add Traveller</button>
+          <button onClick={() => this.setSelector(4)}>Delete Traveller</button>
+          <button onClick={() => this.setSelector(5)}>Blacklist Traveller</button>
+        </div>
+        {
+          this.state.selector === 1 ? <Homepage /> : <hr />
+        }
+        {
+          this.state.selector === 2 ? <Display travellers={this.state.travellers} /> : <hr />
+        }
+        {
+          this.state.selector === 3 ? <Add bookTraveller={this.bookTraveller} /> : <hr />
+        }
+        {
+          this.state.selector === 4 ? <Delete deleteTraveller={this.deleteTraveller} /> : <hr />
+        }
+        {
+          this.state.selector === 5 ? <Blacklist blacklistTraveller={this.blacklistTraveller} /> : <hr />
+        }
       </div>
     );
   }
